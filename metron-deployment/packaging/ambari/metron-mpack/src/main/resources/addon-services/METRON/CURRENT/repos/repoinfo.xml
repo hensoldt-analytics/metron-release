@@ -28,5 +28,26 @@
             <reponame>METRON</reponame>
         </repo>
     </os>
+    <os family="ubuntu12">
+        <repo>
+            <baseurl>http://s3.amazonaws.com/dev.hortonworks.com/HCP/ubuntu12/1.x/BUILDS/1.2.0.0-53</baseurl>
+            <repoid>METRON-${metron.version}</repoid>
+            <reponame>HCP</reponame>
+        </repo>
+    </os>
+    <os family="ubuntu14">
+        <repo>
+            <baseurl>http://s3.amazonaws.com/dev.hortonworks.com/HCP/ubuntu12/1.x/BUILDS/1.2.0.0-53</baseurl>
+            <repoid>METRON-${metron.version}</repoid>
+            <reponame>HCP</reponame>
+        </repo>
+    </os>
+    <os family="ubuntu16">
+        <repo>
+            <baseurl>http://s3.amazonaws.com/dev.hortonworks.com/HCP/ubuntu12/1.x/BUILDS/1.2.0.0-53</baseurl>
+            <repoid>METRON-${metron.version}</repoid>
+            <reponame>HCP</reponame>
+        </repo>
+    </os>
 </reposinfo>
 
