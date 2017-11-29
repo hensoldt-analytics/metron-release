@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentHelper;
@@ -40,6 +41,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.apache.metron.common.configuration.writer.WriterConfiguration;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -106,7 +113,7 @@ public class ElasticsearchUtils {
   }
 
   public static TransportClient getClient(Map<String, Object> globalConfiguration, Map<String, String> optionalSettings) {
-    Settings.Builder settingsBuilder = Settings.settingsBuilder();
+    Settings.Builder settingsBuilder = Settings.builder();
     settingsBuilder.put("cluster.name", globalConfiguration.get("es.clustername"));
     settingsBuilder.put("client.transport.ping_timeout","500s");
     if (optionalSettings != null) {
@@ -115,7 +122,7 @@ public class ElasticsearchUtils {
     Settings settings = settingsBuilder.build();
     TransportClient client;
     try{
-      client = TransportClient.builder().settings(settings).build();
+      client = new PreBuiltTransportClient(settings);
       for(HostnamePort hp : getIps(globalConfiguration)) {
         client.addTransportAddress(
                 new InetSocketTransportAddress(InetAddress.getByName(hp.hostname), hp.port)
@@ -196,9 +203,10 @@ public class ElasticsearchUtils {
   public static Optional<String> toJSON(org.elasticsearch.action.search.SearchRequest esRequest) {
     Optional<String> json = Optional.empty();
 
-    if(esRequest != null) {
+    if(esRequest != null && esRequest.source() != null) {
       try {
-        json = Optional.of(XContentHelper.convertToJson(esRequest.source(), true));
+        BytesReference requestBytes = esRequest.source().buildAsBytes();
+        json = Optional.of(XContentHelper.convertToJson(requestBytes, true));
 
       } catch (Throwable t) {
         LOG.error("Failed to convert search request to JSON", t);
