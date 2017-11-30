@@ -28,5 +28,11 @@
             <reponame>ELASTICSEARCH</reponame>
         </repo>
     </os>
+    <os family="ubuntu14">
+        <repo>
+            <baseurl>https://artifacts.elastic.co/packages/5.x/apt</baseurl>
+            <repoid>elasticsearch-5.x</repoid>
+            <reponame>ELASTICSEARCH</reponame>
+        </repo>
+    </os>
 </reposinfo>
-
