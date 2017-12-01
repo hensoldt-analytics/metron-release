@@ -63,8 +63,8 @@ def elastic():
          group=params.elastic_group
          )
 
-    Logger.info("Master sysconfig: /etc/sysconfig/elasticsearch")
-    File("/etc/sysconfig/elasticsearch",
+    Logger.info("Master sysconfig: path={0}".format(params.elastic_sysconfig))
+    File(params.elastic_sysconfig,
          owner="root",
          group="root",
          content=InlineTemplate(params.sysconfig_template)

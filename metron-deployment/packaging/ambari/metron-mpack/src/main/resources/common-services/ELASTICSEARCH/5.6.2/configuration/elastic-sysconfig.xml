@@ -55,10 +55,10 @@
         <description>Maximum number of memory map areas for process</description>
     </property>
 
-    <!--/etc/sysconfig/elasticsearch-->
+    <!-- Elasticsearch sysconfig -->
     <property>
         <name>content</name>
-        <description>This is the jinja template for elastic sysconfig file (/etc/sysconfig/elasticsearch)</description>
+        <description>This is the jinja template for elastic sysconfig file</description>
         <value>
 # Directory where the Elasticsearch binary distribution resides
 ES_HOME={{elastic_home}}

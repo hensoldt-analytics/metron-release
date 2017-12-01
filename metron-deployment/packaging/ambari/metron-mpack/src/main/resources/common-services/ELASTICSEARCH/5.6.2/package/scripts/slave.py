@@ -62,8 +62,8 @@ def slave():
          group=params.elastic_group
          )
 
-    Logger.info("Slave sysconfig: /etc/sysconfig/elasticsearch")
-    File(format("/etc/sysconfig/elasticsearch"),
+    Logger.info("Slave sysconfig: path={0}".format(params.elastic_sysconfig))
+    File(params.elastic_sysconfig,
          owner="root",
          group="root",
          content=InlineTemplate(params.sysconfig_template)
