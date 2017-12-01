@@ -38,16 +38,4 @@
             <reponame>CURATOR</reponame>
         </repo>
     </os>
-    <os family="ubuntu14">
-        <repo>
-            <baseurl>https://artifacts.elastic.co/packages/5.x/apt</baseurl>
-            <repoid>kibana-5.x</repoid>
-            <reponame>KIBANA</reponame>
-        </repo>
-        <repo>
-            <baseurl>https://packages.elastic.co/curator/5/debian</baseurl>
-            <repoid>ES-Curator-5.x</repoid>
-            <reponame>CURATOR</reponame>
-        </repo>
-    </os>
 </reposinfo>
