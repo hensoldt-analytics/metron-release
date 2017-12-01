@@ -48,6 +48,9 @@
             <baseurl>https://deb.nodesource.com/node_6.x</baseurl>
             <repoid>Nodesource</repoid>
             <reponame>NODESOURCE</reponame>
+            <distribution>trusty</distribution>
+            <components>main</components>
+            <unique>false</unique>
         </repo>
     </os>
 </reposinfo>
