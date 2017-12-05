@@ -20,11 +20,6 @@
             <repoid>METRON-${metron.version}</repoid>
             <reponame>METRON</reponame>
         </repo>
-        <repo>
-            <baseurl>https://rpm.nodesource.com/pub_6.x/el/6/</baseurl>
-            <repoid>Nodesource</repoid>
-            <reponame>NODESOURCE</reponame>
-        </repo>
     </os>
     <os family="redhat7">
         <repo>
@@ -32,25 +27,6 @@
             <repoid>METRON-${metron.version}</repoid>
             <reponame>METRON</reponame>
         </repo>
-        <repo>
-            <baseurl>https://rpm.nodesource.com/pub_6.x/el/7/</baseurl>
-            <repoid>Nodesource</repoid>
-            <reponame>NODESOURCE</reponame>
-        </repo>
-    </os>
-    <os family="ubuntu14">
-        <repo>
-            <baseurl>file:///localrepo</baseurl>
-            <repoid>METRON-${metron.version}</repoid>
-            <reponame>METRON</reponame>
-        </repo>
-        <repo>
-            <baseurl>https://deb.nodesource.com/node_6.x</baseurl>
-            <repoid>Nodesource</repoid>
-            <reponame>NODESOURCE</reponame>
-            <distribution>trusty</distribution>
-            <components>main</components>
-            <unique>false</unique>
-        </repo>
     </os>
 </reposinfo>
+
