@@ -14,15 +14,15 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-kibana_master
-
 """
 
 import errno
 import os
 
+from ambari_commons.os_check import OSCheck
 from ambari_commons.os_family_impl import OsFamilyFuncImpl, OsFamilyImpl
+from resource_management.core.exceptions import ExecutionFailed
+from resource_management.core.exceptions import ComponentIsNotRunning
 from resource_management.core.logger import Logger
 from resource_management.core.resources.system import Directory
 from resource_management.core.resources.system import Execute
@@ -30,24 +30,23 @@ from resource_management.core.resources.system import File
 from resource_management.core.source import InlineTemplate
 from resource_management.libraries.functions.format import format as ambari_format
 from resource_management.libraries.script import Script
-
+from resource_management.libraries.functions.get_user_call_output import get_user_call_output
 
 class Kibana(Script):
+
     def install(self, env):
         import params
         env.set_params(params)
-        Logger.info("Install Kibana Master")
+        Logger.info("Installing Kibana")
         self.install_packages(env)
 
     def configure(self, env, upgrade_type=None, config_dir=None):
         import params
         env.set_params(params)
-
-        Logger.info("Configure Kibana for Metron")
+        Logger.info("Configuring Kibana")
 
         directories = [params.log_dir, params.pid_dir, params.conf_dir]
         Directory(directories,
-                  create_parents=True,
                   mode=0755,
                   owner=params.kibana_user,
                   group=params.kibana_user
@@ -61,42 +60,50 @@ class Kibana(Script):
     def stop(self, env, upgrade_type=None):
         import params
         env.set_params(params)
-
-        Logger.info("Stop Kibana Master")
-
+        Logger.info("Stopping Kibana")
         Execute("service kibana stop")
 
     def start(self, env, upgrade_type=None):
         import params
         env.set_params(params)
-
         self.configure(env)
-
-        Logger.info("Start the Master")
-
-
+        Logger.info("Starting Kibana")
         Execute("service kibana start")
 
     def restart(self, env):
         import params
         env.set_params(params)
-
         self.configure(env)
-
-        Logger.info("Restarting the Master")
-
+        Logger.info("Restarting Kibana")
         Execute("service kibana restart")
 
     def status(self, env):
         import params
         env.set_params(params)
+        Logger.info('Status check Kibana')
 
-        Logger.info("Status of the Master")
+        # return codes defined by LSB
+        # http://refspecs.linuxbase.org/LSB_3.0.0/LSB-PDA/LSB-PDA/iniscrptact.html
+        cmd = "service kibana status"
+        rc, out, err = get_user_call_output(cmd, params.elastic_user, is_checked_call=False)
 
-        Execute("service kibana status")
+        if rc == 3:
+          # if return code = 3, then 'program is not running'
+          Logger.info("Kibana is not running")
+          raise ComponentIsNotRunning()
+
+        elif rc == 0:
+          # if return code = 0, then 'program is running or service is OK'
+          Logger.info("Kibana is running")
+
+        else:
+          # else, program is dead or service state is unknown
+          err_msg = "Execution of '{0}' returned {1}".format(cmd, rc)
+          raise ExecutionFailed(err_msg, rc, out, err)
 
     @OsFamilyFuncImpl(os_family=OsFamilyImpl.DEFAULT)
     def load_template(self, env):
+        from dashboard.dashboardindex import DashboardIndex
         import params
         env.set_params(params)
 
@@ -104,28 +111,20 @@ class Kibana(Script):
         port = int(ambari_format("{es_port}"))
 
         Logger.info("Connecting to Elasticsearch on host: %s, port: %s" % (hostname, port))
+        di = DashboardIndex(host=hostname, port=port)
 
-        kibanaTemplate = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dashboard', 'kibana.template')
-        if not os.path.isfile(kibanaTemplate):
-          raise IOError(
-              errno.ENOENT, os.strerror(errno.ENOENT), kibanaTemplate)
+        # Loads Kibana Dashboard definition from disk and replaces .kibana on index
+        templateFile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dashboard', 'dashboard.p')
+        if not os.path.isfile(templateFile):
+            raise IOError(errno.ENOENT, os.strerror(errno.ENOENT), templateFile)
 
-        Logger.info("Loading .kibana index template from %s" % kibanaTemplate)
-        template_cmd = ambari_format(
-            'curl -s -XPOST http://{es_host}:{es_port}/_template/.kibana -d @%s' % kibanaTemplate)
-        Execute(template_cmd, logoutput=True)
+        Logger.info("Deleting .kibana index from Elasticsearch")
+        di.es.indices.delete(index='.kibana', ignore=[400, 404])
 
-        kibanaDashboardLoad = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dashboard', 'dashboard-bulkload.json')
-        if not os.path.isfile(kibanaDashboardLoad):
-          raise IOError(
-              errno.ENOENT, os.strerror(errno.ENOENT), kibanaDashboardLoad)
-
-        Logger.info("Loading .kibana dashboard from %s" % kibanaDashboardLoad)
-
-        kibana_cmd = ambari_format(
-            'curl -s -H "Content-Type: application/x-ndjson" -XPOST http://{es_host}:{es_port}/.kibana/_bulk --data-binary @%s' % kibanaDashboardLoad)
-        Execute(kibana_cmd, logoutput=True)
+        Logger.info("Loading .kibana index from %s" % templateFile)
+        di.put(data=di.load(filespec=templateFile))
 
 
 if __name__ == "__main__":
     Kibana().execute()
+
