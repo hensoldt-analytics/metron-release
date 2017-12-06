@@ -17,7 +17,6 @@ limitations under the License.
 
 """
 
-from ambari_commons.os_check import OSCheck
 from resource_management.core.logger import Logger
 from resource_management.libraries.functions.get_user_call_output import get_user_call_output
 from resource_management.core.exceptions import ExecutionFailed
@@ -55,20 +54,3 @@ def service_check(cmd, user, label):
       err_msg = "{0} service check failed; cmd '{1}' returned {2}".format(label, cmd, rc)
       Logger.error(err_msg)
       raise ExecutionFailed(err_msg, rc, out, err)
-
-def get_env_path(default="/etc/default/elasticsearch"):
-    """
-    Defines the path to the Elasticsearch environment file.  This path will
-    differ based on the OS family.
-    :param default: The path used if the OS family is not recognized.
-    """
-    path = default
-    if OSCheck.is_redhat_family():
-      path = "/etc/sysconfig/elasticsearch"
-    elif OSCheck.is_ubuntu_family():
-      path = "/etc/default/elasticsearch"
-    else:
-      Logger.error("Unexpected OS family; using default path={0}".format(path))
-
-    return path
-
