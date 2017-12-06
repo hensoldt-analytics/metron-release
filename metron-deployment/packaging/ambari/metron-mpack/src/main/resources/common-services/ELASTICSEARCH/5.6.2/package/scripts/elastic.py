@@ -18,6 +18,8 @@ limitations under the License.
 
 """
 
+from ambari_commons.os_check import OSCheck
+from common import get_env_path
 from resource_management.core.resources.system import Directory
 from resource_management.core.resources.system import File
 from resource_management.core.source import InlineTemplate
@@ -63,8 +65,9 @@ def elastic():
          group=params.elastic_group
          )
 
-    Logger.info("Master sysconfig: path={0}".format(params.elastic_sysconfig))
-    File(params.elastic_sysconfig,
+    elastic_env_path = get_env_path()
+    Logger.info("Master sysconfig: path={0}".format(elastic_env_path))
+    File(elastic_env_path,
          owner="root",
          group="root",
          content=InlineTemplate(params.sysconfig_template)
@@ -76,7 +79,7 @@ def elastic():
               create_parents=True,
               owner='root',
               group='root'
-    )
+              )
 
     Logger.info("Master PAM limits: {0}".format(params.limits_conf_file))
     File(params.limits_conf_file,
