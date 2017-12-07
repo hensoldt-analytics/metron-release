@@ -82,6 +82,7 @@
                 <config-type>elastic-env</config-type>
                 <config-type>elastic-site</config-type>
                 <config-type>elastic-sysconfig</config-type>
+                <config-type>elastic-systemd</config-type>
             </configuration-dependencies>
             <restartRequiredAfterChange>true</restartRequiredAfterChange>
             <quickLinksConfigurations>
