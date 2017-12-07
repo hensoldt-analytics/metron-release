@@ -38,9 +38,6 @@ def service_check(cmd, user, label):
     Logger.info("Performing service check; cmd={0}, user={1}, label={2}".format(cmd, user, label))
     rc, out, err = get_user_call_output(cmd, user, is_checked_call=False)
 
-    if len(err) > 0:
-      Logger.error(err)
-
     if rc in [1, 2, 3]:
       # if return code in [1, 2, 3], then 'program is not running' or 'program is dead'
       Logger.info("{0} is not running".format(label))
@@ -71,4 +68,3 @@ def get_env_path(default="/etc/default/elasticsearch"):
       Logger.error("Unexpected OS family; using default path={0}".format(path))
 
     return path
-

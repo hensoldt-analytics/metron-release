@@ -91,3 +91,8 @@ elastic_user_nofile_limit = config['configurations']['elastic-env']['elastic_use
 elastic_user_nproc_limit = config['configurations']['elastic-env']['elastic_user_nproc_limit']
 elastic_user_memlock_soft_limit = config['configurations']['elastic-env']['elastic_user_memlock_soft_limit']
 elastic_user_memlock_hard_limit = config['configurations']['elastic-env']['elastic_user_memlock_hard_limit']
+
+# the status check (service elasticsearch status) cannot be run by the 'elasticsearch'
+# user due to the default permissions that are set when the package is installed.  the
+# status check must be run as root
+elastic_status_check_user = 'root'

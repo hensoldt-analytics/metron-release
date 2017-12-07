@@ -54,7 +54,10 @@ class Elasticsearch(Script):
         import params
         env.set_params(params)
         Logger.info('Status check Elasticsearch master node')
-        service_check("service elasticsearch status", user=params.elastic_user, label="Elasticsearch Master")
+        service_check(
+          cmd="service elasticsearch status",
+          user=params.elastic_status_check_user,
+          label="Elasticsearch Master")
 
     def restart(self, env):
         import params
@@ -67,4 +70,3 @@ class Elasticsearch(Script):
 
 if __name__ == "__main__":
     Elasticsearch().execute()
-
