@@ -93,23 +93,26 @@ def elastic():
          )
 
     # is the platform running systemd?
-    checksystemd_cmd = "pidof systemd"
-    Logger.info("Checking if platform is running systemd..")
-    rc, out, err = get_user_call_output(checksystemd_cmd, "root", is_checked_call=False)
+    Logger.info("Is platform running systemd?")
+    rc, out, err = get_user_call_output("pidof systemd", "root", is_checked_call=False)
     if rc == 0:
-        Logger.info("Configuring systemd for Elasticsearch");
+        Logger.info("Systemd found; configuring for Elasticsearch");
+
+        # ensure the systemd directory for elasticsearch overrides exists
+        Logger.info("Create systemd directory for Elasticsearch: {0}".format(params.systemd_elasticsearch_dir))
+        Directory(params.systemd_elasticsearch_dir,
+                  create_parents=True,
+                  owner='root',
+                  group='root')
 
         # when using Elasticsearch packages on systems that use systemd, system
         # limits must also be specified via systemd.
         # see https://www.elastic.co/guide/en/elasticsearch/reference/5.6/setting-system-settings.html#systemd
-        Logger.info("Elasticsearch systemd limits: {0}".format(params.systemd_elasticsearch_override_file))
-        # First create systemd_elasticsearch_override_dir
-        createdir_cmd = "mkdir -p " + params.systemd_elasticsearch_override_dir
-        rc, out, err = get_user_call_output(createdir_cmd, "root", is_checked_call=False)
-        if rc == 0:
-            File(params.systemd_elasticsearch_override_file,
-                content=InlineTemplate(params.systemd_override_template),
-                owner="root",
-                group="root"
-             )
-            Execute("systemctl daemon-reload")
+        Logger.info("Elasticsearch systemd limits: {0}".format(params.systemd_override_file))
+        File(params.systemd_override_file,
+             content=InlineTemplate(params.systemd_override_template),
+             owner="root",
+             group="root")
+
+        # reload the configuration
+        Execute("systemctl daemon-reload")

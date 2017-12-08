@@ -100,6 +100,6 @@ elastic_status_check_user = 'root'
 # must be specified via systemd.
 # see https://www.elastic.co/guide/en/elasticsearch/reference/5.6/setting-system-settings.html#systemd
 systemd_parent_dir = '/etc/systemd/system/'
-systemd_elasticsearch_override_dir = systemd_parent_dir + 'elasticsearch.service.d/'
-systemd_elasticsearch_override_file = systemd_elasticsearch_override_dir + 'override.conf'
+systemd_elasticsearch_dir = systemd_parent_dir + 'elasticsearch.service.d/'
+systemd_override_file = systemd_elasticsearch_dir + 'override.conf'
 systemd_override_template = config['configurations']['elastic-systemd']['content']
