@@ -30,6 +30,7 @@ from resource_management.core.source import Template
 from resource_management.core.resources import User
 from resource_management.core.logger import Logger
 from resource_management.libraries.functions import format as ambari_format
+from resource_management.libraries.functions.get_user_call_output import get_user_call_output
 
 def elastic():
     import params
@@ -92,16 +93,23 @@ def elastic():
          )
 
     # is the platform running systemd?
-    if os.path.exists(params.systemd_parent_dir):
+    checksystemd_cmd = "pidof systemd"
+    Logger.info("Checking if platform is running systemd..")
+    rc, out, err = get_user_call_output(checksystemd_cmd, "root", is_checked_call=False)
+    if rc == 0:
         Logger.info("Configuring systemd for Elasticsearch");
 
         # when using Elasticsearch packages on systems that use systemd, system
         # limits must also be specified via systemd.
         # see https://www.elastic.co/guide/en/elasticsearch/reference/5.6/setting-system-settings.html#systemd
-        Logger.info("Elasticsearch systemd limits: {0}".format(params.systemd_override_file))
-        File(params.systemd_override_file,
-             content=InlineTemplate(params.systemd_override_template),
-             owner="root",
-             group="root"
+        Logger.info("Elasticsearch systemd limits: {0}".format(params.systemd_elasticsearch_override_file))
+        # First create systemd_elasticsearch_override_dir
+        createdir_cmd = "mkdir -p " + params.systemd_elasticsearch_override_dir
+        rc, out, err = get_user_call_output(createdir_cmd, "root", is_checked_call=False)
+        if rc == 0:
+            File(params.systemd_elasticsearch_override_file,
+                content=InlineTemplate(params.systemd_override_template),
+                owner="root",
+                group="root"
              )
-        Execute("systemctl daemon-reload")
+            Execute("systemctl daemon-reload")
