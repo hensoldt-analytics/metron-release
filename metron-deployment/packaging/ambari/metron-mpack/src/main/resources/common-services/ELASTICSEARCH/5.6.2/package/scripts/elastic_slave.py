@@ -23,10 +23,11 @@ from resource_management.core.logger import Logger
 from resource_management.libraries.functions.get_user_call_output import get_user_call_output
 from resource_management.core.exceptions import ExecutionFailed
 from resource_management.core.exceptions import ComponentIsNotRunning
-from common import service_check
-from slave import slave
+from elastic_commands import service_check
+from elastic_commands import configure_slave
 
 class Elasticsearch(Script):
+
     def install(self, env):
         import params
         env.set_params(params)
@@ -37,7 +38,7 @@ class Elasticsearch(Script):
         import params
         env.set_params(params)
         Logger.info('Configure Elasticsearch slave node')
-        slave()
+        configure_slave()
 
     def stop(self, env, upgrade_type=None):
         import params

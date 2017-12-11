@@ -51,7 +51,7 @@ class ServiceCheck(Script):
         """
         Logger.info("Checking cluster health")
 
-        cmd = "curl -sS -XGET 'http://{0}:{1}/_cluster/health?wait_for_status={2}&timeout={3}'"
+        cmd = "curl -sS -XGET 'http://{0}:{1}/_cluster/health?wait_for_status={2}&timeout={3}' | grep '\"status\":\"{2}\"'"
         Execute(cmd.format(host, port, status, timeout), logoutput=True, tries=5, try_sleep=10)
 
     def get_port_from_range(self, port_range, delimiter="-", default="9200"):

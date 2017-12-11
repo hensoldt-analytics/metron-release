@@ -20,8 +20,8 @@ limitations under the License.
 from resource_management.core.resources.system import Execute
 from resource_management.libraries.script import Script
 from resource_management.core.logger import Logger
-from elastic import elastic
-from common import service_check
+from elastic_commands import service_check
+from elastic_commands import configure_master
 
 class Elasticsearch(Script):
 
@@ -35,7 +35,7 @@ class Elasticsearch(Script):
         import params
         env.set_params(params)
         Logger.info('Configure Elasticsearch master node')
-        elastic()
+        configure_master()
 
     def stop(self, env, upgrade_type=None):
         import params
@@ -63,7 +63,6 @@ class Elasticsearch(Script):
         import params
         env.set_params(params)
         Logger.info('Restart Elasticsearch master node')
-
         self.configure(env)
         Execute("service elasticsearch restart")
 
