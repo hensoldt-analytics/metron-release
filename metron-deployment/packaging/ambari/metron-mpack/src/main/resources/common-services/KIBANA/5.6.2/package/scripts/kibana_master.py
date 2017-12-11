@@ -31,6 +31,7 @@ from resource_management.core.source import InlineTemplate
 from resource_management.libraries.functions.format import format as ambari_format
 from resource_management.libraries.script import Script
 from resource_management.libraries.functions.get_user_call_output import get_user_call_output
+from common import service_check
 
 class Kibana(Script):
 
@@ -81,25 +82,7 @@ class Kibana(Script):
         import params
         env.set_params(params)
         Logger.info('Status check Kibana')
-
-        # return codes defined by LSB
-        # http://refspecs.linuxbase.org/LSB_3.0.0/LSB-PDA/LSB-PDA/iniscrptact.html
-        cmd = "service kibana status"
-        rc, out, err = get_user_call_output(cmd, params.elastic_user, is_checked_call=False)
-
-        if rc == 3:
-          # if return code = 3, then 'program is not running'
-          Logger.info("Kibana is not running")
-          raise ComponentIsNotRunning()
-
-        elif rc == 0:
-          # if return code = 0, then 'program is running or service is OK'
-          Logger.info("Kibana is running")
-
-        else:
-          # else, program is dead or service state is unknown
-          err_msg = "Execution of '{0}' returned {1}".format(cmd, rc)
-          raise ExecutionFailed(err_msg, rc, out, err)
+        service_check("service kibana status", user=params.kibana_user, label="Kibana")  
 
     @OsFamilyFuncImpl(os_family=OsFamilyImpl.DEFAULT)
     def load_template(self, env):

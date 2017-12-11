@@ -83,10 +83,4 @@ export PATH=$PATH:$JAVA_HOME/bin
     <value>unlimited</value>
     <description>Max locked-in memory address space (hard memlock limit).</description>
   </property>
-  <property>
-      <name>elastic_sysconfig</name>
-      <description>Path to sysconfig file for Elasticsearch</description>
-      <value>/etc/default/elasticsearch</value>
-      <display-name>Elasticsearch sysconfig</display-name>
-  </property>
 </configuration>

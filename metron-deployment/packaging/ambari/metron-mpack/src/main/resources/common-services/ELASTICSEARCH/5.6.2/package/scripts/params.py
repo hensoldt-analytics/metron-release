@@ -47,7 +47,6 @@ hostname = config['hostname']
 java64_home = config['hostLevelParams']['java_home']
 elastic_env_sh_template = config['configurations']['elastic-env']['content']
 sysconfig_template = config['configurations']['elastic-sysconfig']['content']
-elastic_sysconfig = config['configurations']['elastic-env']['elastic_sysconfig']
 
 cluster_name = config['configurations']['elastic-site']['cluster_name']
 zen_discovery_ping_unicast_hosts = config['configurations']['elastic-site']['zen_discovery_ping_unicast_hosts']
@@ -91,3 +90,16 @@ elastic_user_nofile_limit = config['configurations']['elastic-env']['elastic_use
 elastic_user_nproc_limit = config['configurations']['elastic-env']['elastic_user_nproc_limit']
 elastic_user_memlock_soft_limit = config['configurations']['elastic-env']['elastic_user_memlock_soft_limit']
 elastic_user_memlock_hard_limit = config['configurations']['elastic-env']['elastic_user_memlock_hard_limit']
+
+# the status check (service elasticsearch status) cannot be run by the 'elasticsearch'
+# user due to the default permissions that are set when the package is installed.  the
+# status check must be run as root
+elastic_status_check_user = 'root'
+
+# when using the RPM or Debian packages on systems that use systemd, system limits
+# must be specified via systemd.
+# see https://www.elastic.co/guide/en/elasticsearch/reference/5.6/setting-system-settings.html#systemd
+systemd_parent_dir = '/etc/systemd/system/'
+systemd_elasticsearch_dir = systemd_parent_dir + 'elasticsearch.service.d/'
+systemd_override_file = systemd_elasticsearch_dir + 'override.conf'
+systemd_override_template = config['configurations']['elastic-systemd']['content']
