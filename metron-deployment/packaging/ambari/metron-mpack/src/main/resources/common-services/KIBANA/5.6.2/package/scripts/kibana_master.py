@@ -86,7 +86,6 @@ class Kibana(Script):
 
     @OsFamilyFuncImpl(os_family=OsFamilyImpl.DEFAULT)
     def load_template(self, env):
-        from dashboard.dashboardindex import DashboardIndex
         import params
         env.set_params(params)
 
@@ -94,18 +93,27 @@ class Kibana(Script):
         port = int(ambari_format("{es_port}"))
 
         Logger.info("Connecting to Elasticsearch on host: %s, port: %s" % (hostname, port))
-        di = DashboardIndex(host=hostname, port=port)
 
-        # Loads Kibana Dashboard definition from disk and replaces .kibana on index
-        templateFile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dashboard', 'dashboard.p')
-        if not os.path.isfile(templateFile):
-            raise IOError(errno.ENOENT, os.strerror(errno.ENOENT), templateFile)
+        kibanaTemplate = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dashboard', 'kibana.template')
+        if not os.path.isfile(kibanaTemplate):
+          raise IOError(
+              errno.ENOENT, os.strerror(errno.ENOENT), kibanaTemplate)
 
-        Logger.info("Deleting .kibana index from Elasticsearch")
-        di.es.indices.delete(index='.kibana', ignore=[400, 404])
+        Logger.info("Loading .kibana index template from %s" % kibanaTemplate)
+        template_cmd = ambari_format(
+            'curl -s -XPOST http://{es_host}:{es_port}/_template/.kibana -d @%s' % kibanaTemplate)
+        Execute(template_cmd, logoutput=True)
 
-        Logger.info("Loading .kibana index from %s" % templateFile)
-        di.put(data=di.load(filespec=templateFile))
+        kibanaDashboardLoad = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dashboard', 'dashboard-bulkload.json')
+        if not os.path.isfile(kibanaDashboardLoad):
+          raise IOError(
+              errno.ENOENT, os.strerror(errno.ENOENT), kibanaDashboardLoad)
+
+        Logger.info("Loading .kibana dashboard from %s" % kibanaDashboardLoad)
+
+        kibana_cmd = ambari_format(
+            'curl -s -H "Content-Type: application/x-ndjson" -XPOST http://{es_host}:{es_port}/.kibana/_bulk --data-binary @%s' % kibanaDashboardLoad)
+        Execute(kibana_cmd, logoutput=True)
 
 
 if __name__ == "__main__":
