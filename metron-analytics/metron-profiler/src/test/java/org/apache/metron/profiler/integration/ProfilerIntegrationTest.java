@@ -28,15 +28,18 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.utils.SerDeUtils;
-import org.apache.metron.hbase.mock.MockHTable;
 import org.apache.metron.hbase.mock.MockHBaseTableProvider;
+import org.apache.metron.hbase.mock.MockHTable;
 import org.apache.metron.integration.BaseIntegrationTest;
 import org.apache.metron.integration.ComponentRunner;
 import org.apache.metron.integration.UnableToStartException;
 import org.apache.metron.integration.components.FluxTopologyComponent;
 import org.apache.metron.integration.components.KafkaComponent;
 import org.apache.metron.integration.components.ZKServerComponent;
+import org.apache.metron.profiler.ProfileMeasurement;
 import org.apache.metron.profiler.hbase.ColumnBuilder;
+import org.apache.metron.profiler.hbase.RowKeyBuilder;
+import org.apache.metron.profiler.hbase.SaltyRowKeyBuilder;
 import org.apache.metron.profiler.hbase.ValueOnlyColumnBuilder;
 import org.apache.metron.statistics.OnlineStatisticsProvider;
 import org.junit.After;
@@ -47,11 +50,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -109,15 +114,39 @@ public class ProfilerIntegrationTest extends BaseIntegrationTest {
   private static ComponentRunner runner;
   private static MockHTable profilerTable;
 
+  private static final long startAt = 10;
+  private static final String entity = "10.0.0.1";
   private static final String tableName = "profiler";
   private static final String columnFamily = "P";
   private static final double epsilon = 0.001;
   private static final String inputTopic = Constants.INDEXING_TOPIC;
   private static final String outputTopic = "profiles";
-
+  private static final int saltDivisor = 10;
+  private static final long periodDurationMillis = TimeUnit.SECONDS.toMillis(10);
 
   /**
-   * Tests the first example contained within the README.
+   * [
+   *    org.apache.metron.profiler.ProfileMeasurement,
+   *    org.apache.metron.profiler.ProfilePeriod,
+   *    org.apache.metron.common.configuration.profiler.ProfileResult,
+   *    org.apache.metron.common.configuration.profiler.ProfileResultExpressions,
+   *    org.apache.metron.common.configuration.profiler.ProfileTriageExpressions,
+   *    org.apache.metron.common.configuration.profiler.ProfilerConfig,
+   *    org.apache.metron.common.configuration.profiler.ProfileConfig,
+   *    org.json.simple.JSONObject,
+   *    java.util.LinkedHashMap,
+   *    org.apache.metron.statistics.OnlineStatisticsProvider
+   *  ]
+   */
+  @Multiline
+  private static String kryoSerializers;
+
+  /**
+   * The Profiler can generate profiles based on processing time.  With processing time,
+   * the Profiler builds profiles based on when the telemetry was processed.
+   *
+   * <p>Not defining a 'timestampField' within the Profiler configuration tells the Profiler
+   * to use processing time.
    */
   @Test
   public void testExample1() throws Exception {
@@ -195,8 +224,8 @@ public class ProfilerIntegrationTest extends BaseIntegrationTest {
 
     // verify - there are 5 'HTTP' messages each with a length of 20, thus the average should be 20
     Assert.assertTrue("Could not find a value near 20. Actual values read are are: " + Joiner.on(",").join(actuals)
-                     , actuals.stream().anyMatch(val -> MathUtils.equals(val, 20.0, epsilon)
-    ));
+            , actuals.stream().anyMatch(val -> MathUtils.equals(val, 20.0, epsilon)
+            ));
   }
 
   /**
@@ -283,11 +312,23 @@ public class ProfilerIntegrationTest extends BaseIntegrationTest {
             .flatMap(l -> l.stream())
             .collect(Collectors.toList());
 
-    // storm topology properties
+
     final Properties topologyProperties = new Properties() {{
+
+      // storm topology properties
       setProperty("kafka.start", "UNCOMMITTED_EARLIEST");
       setProperty("profiler.workers", "1");
       setProperty("profiler.executors", "0");
+      setProperty("storm.auto.credentials", "[]");
+      setProperty("topology.auto-credentials", "[]");
+
+      // ensure tuples are serialized during the test, otherwise serialization problems
+      // will not be found until the topology is run on a cluster with multiple workers
+      setProperty("topology.testing.always.try.serialize", "true");
+      setProperty("topology.fall.back.on.java.serialization", "false");
+      setProperty("topology.kryo.register", kryoSerializers);
+
+      // kafka settings
       setProperty("profiler.input.topic", inputTopic);
       setProperty("profiler.output.topic", outputTopic);
       setProperty("profiler.period.duration", "20");

@@ -21,6 +21,9 @@ config:
     topology.workers: ${profiler.workers}
     topology.acker.executors: ${profiler.executors}
     topology.auto-credentials: ${topology.auto-credentials}
+    topology.testing.always.try.serialize: ${topology.testing.always.try.serialize}
+    topology.fall.back.on.java.serialization: ${topology.fall.back.on.java.serialization}
+    topology.kryo.register: ${topology.kryo.register}
 
 components:
 

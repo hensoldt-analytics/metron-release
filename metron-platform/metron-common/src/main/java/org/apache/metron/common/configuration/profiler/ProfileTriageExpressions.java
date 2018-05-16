@@ -20,6 +20,7 @@ package org.apache.metron.common.configuration.profiler;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ import java.util.Map;
  * The result of evaluating each expression are made available, keyed
  * by the given name, to the threat triage process.
  */
-public class ProfileTriageExpressions {
+public class ProfileTriageExpressions implements Serializable {
 
   /**
    * A set of named Stellar expressions.  The name of the expression
