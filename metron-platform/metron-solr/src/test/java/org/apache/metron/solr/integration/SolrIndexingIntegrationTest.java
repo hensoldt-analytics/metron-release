@@ -18,6 +18,10 @@
 package org.apache.metron.solr.integration;
 
 import com.google.common.base.Function;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import javax.annotation.Nullable;
 import org.apache.metron.common.configuration.Configurations;
 import org.apache.metron.common.configuration.ConfigurationsUtils;
 import org.apache.metron.common.interfaces.FieldNameConverter;
@@ -33,15 +37,10 @@ import org.apache.metron.integration.components.KafkaComponent;
 import org.apache.metron.integration.components.ZKServerComponent;
 import org.apache.metron.solr.integration.components.SolrComponent;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 public class SolrIndexingIntegrationTest extends IndexingIntegrationTest {
 
-  private String collection = "metron";
+  private String collection = "yaf";
+
   private FieldNameConverter fieldNameConverter = fieldName -> fieldName;
   @Override
   public FieldNameConverter getFieldNameConverter() {
@@ -51,8 +50,8 @@ public class SolrIndexingIntegrationTest extends IndexingIntegrationTest {
   @Override
   public InMemoryComponent getSearchComponent(final Properties topologyProperties) throws Exception {
     SolrComponent solrComponent = new SolrComponent.Builder()
-            .addCollection(collection, "../metron-solr/src/test/resources/solr/conf")
-            .withPostStartCallback(new Function<SolrComponent, Void>() {
+        .addInitialCollection(collection, "../metron-solr/src/main/config/schema/yaf")
+        .withPostStartCallback(new Function<SolrComponent, Void>() {
               @Nullable
               @Override
               public Void apply(@Nullable SolrComponent solrComponent) {
