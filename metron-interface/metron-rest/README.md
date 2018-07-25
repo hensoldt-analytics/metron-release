@@ -210,6 +210,17 @@ Setting active profiles is done with the METRON_SPRING_PROFILES_ACTIVE variable.
 METRON_SPRING_PROFILES_ACTIVE="vagrant,dev"
 ```
 
+## Pcap Query
+
+The REST application exposes endpoints for querying Pcap data.  For more information about filtering options see [Query Filter Utility](../../metron-platform/metron-pcap-backend#query-filter-utility).
+
+There is an endpoint available that will return Pcap data in [PDML](https://wiki.wireshark.org/PDML) format.  [Wireshark](https://www.wireshark.org/) must be installed for this feature to work.
+Installing wireshark in CentOS can be done with `yum -y install wireshark`.
+
+The REST application uses a Java Process object to call out to the `pcap_to_pdml.sh` script.  This script is installed at `$METRON_HOME/bin/pcap_to_pdml.sh` by default.
+Out of the box it is a simple wrapper around the tshark command to transform raw pcap data to PDML.  However it can be extended to do additional processing as long as the expected input/output is maintained.
+REST will supply the script with raw pcap data through standard in and expects PDML data serialized as XML.
+
 ## API
 
 Request and Response objects are JSON formatted.  The JSON schemas are available in the Swagger UI.
@@ -242,6 +253,12 @@ Request and Response objects are JSON formatted.  The JSON schemas are available
 | [ `GET /api/v1/metaalert/add/alert`](#get-apiv1metaalertaddalert)|
 | [ `GET /api/v1/metaalert/remove/alert`](#get-apiv1metaalertremovealert)|
 | [ `GET /api/v1/metaalert/update/status/{guid}/{status}`](#get-apiv1metaalertupdatestatusguidstatus)|
+| [ `POST /api/v1/pcap/fixed`](#post-apiv1pcapfixed)|
+| [ `POST /api/v1/pcap/query`](#post-apiv1pcapquery)|
+| [ `GET /api/v1/pcap`](#get-apiv1pcap)|
+| [ `GET /api/v1/pcap/{jobId}`](#get-apiv1pcapjobid)|
+| [ `GET /api/v1/pcap/{jobId}/pdml`](#get-apiv1pcapjobidpdml)|
+| [ `GET /api/v1/pcap/{jobId}/raw`](#get-apiv1pcapjobidraw)|
 | [ `GET /api/v1/search/search`](#get-apiv1searchsearch)|
 | [ `POST /api/v1/search/search`](#get-apiv1searchsearch)|
 | [ `POST /api/v1/search/group`](#get-apiv1searchgroup)|
@@ -485,6 +502,60 @@ Request and Response objects are JSON formatted.  The JSON schemas are available
     * status - Meta alert status with a value of either 'ACTIVE' or 'INACTIVE'
   * Returns:
     * 200 - Returns 'true' if the status changed and 'false' if it did not.
+
+### `POST /api/v1/pcap/fixed`
+  * Description: Executes a Fixed Filter Pcap Query.
+  * Input:
+    * fixedPcapRequest - A Fixed Pcap Request which includes fixed filter fields like ip source address and protocol
+  * Returns:
+    * 200 - Returns a job status with job ID.
+    
+### `POST /api/v1/pcap/query`
+  * Description: Executes a Query Filter Pcap Query.
+  * Input:
+    * queryPcapRequest - A Query Pcap Request which includes Stellar query field
+  * Returns:
+    * 200 - Returns a job status with job ID.
+    
+### `GET /api/v1/pcap`
+  * Description: Gets a list of job statuses for Pcap query jobs that match the requested state.
+  * Input:
+    * state - Job state
+  * Returns:
+    * 200 - Returns a list of job statuses for jobs that match the requested state.  
+ 
+### `GET /api/v1/pcap/{jobId}`
+  * Description: Gets job status for Pcap query job.
+  * Input:
+    * jobId - Job ID of submitted job
+  * Returns:
+    * 200 - Returns a job status for the Job ID.
+    * 404 - Job is missing.
+    
+### `GET /api/v1/pcap/{jobId}/pdml`
+  * Description: Gets Pcap Results for a page in PDML format.
+  * Input:
+    * jobId - Job ID of submitted job
+    * page - Page number
+  * Returns:
+    * 200 - Returns PDML in json format.
+    * 404 - Job or page is missing.
+    
+### `GET /api/v1/pcap/{jobId}/raw`
+  * Description: Download Pcap Results for a page.
+  * Input:
+    * jobId - Job ID of submitted job
+    * page - Page number
+  * Returns:
+    * 200 - Returns Pcap as a file download.
+    * 404 - Job or page is missing.
+    
+### `DELETE /api/v1/pcap/kill/{jobId}`
+  * Description: Kills running job.
+  * Input:
+    * jobId - Job ID of submitted job
+  * Returns:
+    * 200 - Kills passed job.
 
 ### `POST /api/v1/search/search`
   * Description: Searches the indexing store. GUIDs must be quoted to ensure correct results.
