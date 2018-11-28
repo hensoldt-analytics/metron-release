@@ -19,14 +19,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.metron.packaging.mpacks</groupId>
-    <artifactId>metron_mpack</artifactId>
-    <version>0.4.3.0</version>
+    <artifactId>hcp-ambari-mpack</artifactId>
+    <version>1.4.2.5-1</version>
     <name>Metron Ambari Management Pack</name>
 
     <parent>
         <groupId>org.apache.metron</groupId>
         <artifactId>metron-deployment</artifactId>
-        <version>0.4.3</version>
+        <version>0.4.1.1.4.2.5-1</version>
         <relativePath>../../..</relativePath>
     </parent>
 
@@ -55,7 +55,7 @@
                         <configuration>
                             <name>metron.version</name>
                             <value>${project.parent.version}</value>
-                            <regex>-SNAPSHOT</regex>
+                            <regex>-.*</regex>
                             <replacement></replacement>
                             <failIfNoMatch>false</failIfNoMatch>
                         </configuration>
@@ -68,7 +68,7 @@
                         <configuration>
                             <name>metron.short.version</name>
                             <value>${project.parent.version}</value>
-                            <regex>\.|-SNAPSHOT</regex>
+                            <regex>\.|-.*</regex>
                             <replacement></replacement>
                             <failIfNoMatch>false</failIfNoMatch>
                         </configuration>

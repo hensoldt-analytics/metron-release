@@ -16,23 +16,23 @@
 <reposinfo>
     <os family="redhat6">
         <repo>
-            <baseurl>file:///localrepo</baseurl>
-            <repoid>METRON-${metron.version}</repoid>
+            <baseurl>http://s3.amazonaws.com/dev.hortonworks.com/HCP/centos6/1.x/BUILDS/1.4.2.5-1</baseurl>
+            <repoid>HCP-1.4.2.5-1</repoid>
             <reponame>METRON</reponame>
         </repo>
     </os>
     <os family="redhat7">
         <repo>
-            <baseurl>file:///localrepo</baseurl>
-            <repoid>METRON-${metron.version}</repoid>
+            <baseurl>http://s3.amazonaws.com/dev.hortonworks.com/HCP/centos6/1.x/BUILDS/1.4.2.5-1</baseurl>
+            <repoid>HCP-1.4.2.5-1</repoid>
             <reponame>METRON</reponame>
         </repo>
     </os>
     <os family="ubuntu14">
         <repo>
-            <baseurl>file:///localrepo</baseurl>
-            <repoid>METRON-${metron.version}</repoid>
-            <reponame>METRON</reponame>
+            <baseurl>http://s3.amazonaws.com/dev.hortonworks.com/HCP/ubuntu12/1.x/BUILDS/1.4.2.5-1</baseurl>
+            <repoid>HCP-1.4.2.5-1</repoid>
+            <reponame>HCP</reponame>
         </repo>
     </os>
 </reposinfo>
