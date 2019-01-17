@@ -29,7 +29,8 @@ import org.apache.metron.common.configuration.enrichment.threatintel.ThreatScore
 import org.apache.metron.common.configuration.enrichment.threatintel.ThreatTriageConfig;
 import org.apache.metron.common.message.MessageGetStrategy;
 import org.apache.metron.common.utils.MessageUtils;
-import org.apache.metron.enrichment.adapters.geo.GeoLiteDatabase;
+import org.apache.metron.enrichment.adapters.maxmind.asn.GeoLiteAsnDatabase;
+import org.apache.metron.enrichment.adapters.maxmind.geo.GeoLiteCityDatabase;
 import org.apache.metron.enrichment.utils.ThreatIntelUtils;
 import org.apache.metron.stellar.dsl.Context;
 import org.apache.metron.stellar.dsl.StellarFunctions;
@@ -79,7 +80,10 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
   @Override
   public void prepare(Map map, TopologyContext topologyContext) {
     super.prepare(map, topologyContext);
-    GeoLiteDatabase.INSTANCE.update((String)getConfigurations().getGlobalConfig().get(GeoLiteDatabase.GEO_HDFS_FILE));
+    GeoLiteCityDatabase.INSTANCE.update((String)getConfigurations().getGlobalConfig().get(
+        GeoLiteCityDatabase.GEO_HDFS_FILE));
+    GeoLiteAsnDatabase.INSTANCE.update((String)getConfigurations().getGlobalConfig().get(
+        GeoLiteAsnDatabase.ASN_HDFS_FILE));
     initializeStellar();
   }
 
@@ -117,7 +121,7 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
   public void reloadCallback(String name, ConfigurationType type) {
     super.reloadCallback(name, type);
     if(type == ConfigurationType.GLOBAL) {
-      GeoLiteDatabase.INSTANCE.updateIfNecessary(getConfigurations().getGlobalConfig());
+      GeoLiteCityDatabase.INSTANCE.updateIfNecessary(getConfigurations().getGlobalConfig());
     }
   }
 
