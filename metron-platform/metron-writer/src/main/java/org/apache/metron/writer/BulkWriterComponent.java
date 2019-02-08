@@ -19,7 +19,7 @@
 package org.apache.metron.writer;
 
 import com.google.common.collect.Iterables;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.error.MetronError;
@@ -254,7 +254,7 @@ public class BulkWriterComponent<MESSAGE_T> {
     }
   }
 
-  private void flush( String sensorType
+  protected void flush( String sensorType
                     , BulkMessageWriter<MESSAGE_T> bulkMessageWriter
                     , WriterConfiguration configurations
 		                , MessageGetStrategy messageGetStrategy
@@ -290,7 +290,7 @@ public class BulkWriterComponent<MESSAGE_T> {
     }
     long endTime = System.currentTimeMillis();
     long elapsed = endTime - startTime;
-    LOG.debug("Bulk batch for sensor {} completed in ~{} ns", sensorType, elapsed);
+    LOG.debug("Flushed batch successfully; sensorType={}, batchSize={}, took={} ms", sensorType, CollectionUtils.size(tupleList), elapsed);
   }
 
   // Flushes all queues older than their batchTimeouts.
@@ -308,7 +308,6 @@ public class BulkWriterComponent<MESSAGE_T> {
           || clock.currentTimeMillis() - batchTimeoutInfo[LAST_CREATE_TIME_MS] >= batchTimeoutInfo[TIMEOUT_MS]) {
         flush(sensorType, bulkMessageWriter, configurations, messageGetStrategy
 	            , sensorTupleMap.get(sensorType), sensorMessageMap.get(sensorType));
-        return;
       }
     }
   }
