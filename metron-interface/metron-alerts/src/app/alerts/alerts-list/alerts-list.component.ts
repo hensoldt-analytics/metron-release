@@ -57,14 +57,11 @@ export class AlertsListComponent implements OnInit, OnDestroy {
   alerts: Alert[] = [];
   searchResponse: SearchResponse = new SearchResponse();
   colNumberTimerId: number;
-  refreshInterval = RefreshInterval.ONE_MIN;
+  refreshInterval = RefreshInterval.TEN_MIN;
   refreshTimer: Subscription;
-  pauseRefresh = false;
-  lastPauseRefreshValue = false;
-  isMetaAlertPresentInSelectedAlerts = false;
-  timeStampfilterPresent = false;
-  selectedTimeRange = new Filter(TIMESTAMP_FIELD_NAME, ALL_TIME, false);
-  threatScoreFieldName = THREAT_SCORE_FIELD_NAME;
+  pauseRefresh = true;
+  lastPauseRefreshValue = true;
+  threatScoreFieldName = 'threat:triage:score';
 
   @ViewChild('table') table: ElementRef;
   @ViewChild('dataViewComponent') dataViewComponent: TableViewComponent;
@@ -157,8 +154,26 @@ export class AlertsListComponent implements OnInit, OnDestroy {
         this.configureTableService.getTableMetadata(),
         this.clusterMetaDataService.getDefaultColumns()
     ).subscribe((response: any) => {
-      this.prepareData(response[0], response[1], resetPaginationForSearch);
+      this.prepareData(response[0], response[1]);
+      this.refreshAlertData(resetPaginationForSearch);
     });
+  }
+
+  private refreshAlertData(resetPaginationForSearch: boolean) {
+    if (this.alerts.length) {
+      this.search(resetPaginationForSearch);
+    }
+  }
+
+  getCollapseComponentData(data: any) {
+    return {
+      getName: () => {
+        return Object.keys(data.aggregations)[0];
+      },
+      getData: () => {
+        return data.aggregations[Object.keys(data.aggregations)[0]].buckets;
+      },
+    };
   }
 
   getColumnNamesForQuery() {
@@ -259,14 +274,12 @@ export class AlertsListComponent implements OnInit, OnDestroy {
     this.calcColumnsToDisplay();
   }
 
-  prepareData(tableMetaData: TableMetadata, defaultColumns: ColumnMetadata[], resetPagination: boolean) {
+  prepareData(tableMetaData: TableMetadata, defaultColumns: ColumnMetadata[]) {
     this.tableMetaData = tableMetaData;
     this.refreshInterval = this.tableMetaData.refreshInterval;
 
     this.updateConfigRowsSettings();
     this.prepareColumnData(tableMetaData.tableColumns, defaultColumns);
-
-    this.search(resetPagination);
   }
 
   processEscalate() {
