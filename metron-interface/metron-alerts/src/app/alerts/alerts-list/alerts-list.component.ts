@@ -61,7 +61,10 @@ export class AlertsListComponent implements OnInit, OnDestroy {
   refreshTimer: Subscription;
   pauseRefresh = true;
   lastPauseRefreshValue = true;
-  threatScoreFieldName = 'threat:triage:score';
+  isMetaAlertPresentInSelectedAlerts = false;
+  timeStampfilterPresent = false;
+  selectedTimeRange = new Filter(TIMESTAMP_FIELD_NAME, ALL_TIME, false);
+  threatScoreFieldName = THREAT_SCORE_FIELD_NAME;
 
   @ViewChild('table') table: ElementRef;
   @ViewChild('dataViewComponent') dataViewComponent: TableViewComponent;
@@ -163,17 +166,6 @@ export class AlertsListComponent implements OnInit, OnDestroy {
     if (this.alerts.length) {
       this.search(resetPaginationForSearch);
     }
-  }
-
-  getCollapseComponentData(data: any) {
-    return {
-      getName: () => {
-        return Object.keys(data.aggregations)[0];
-      },
-      getData: () => {
-        return data.aggregations[Object.keys(data.aggregations)[0]].buckets;
-      },
-    };
   }
 
   getColumnNamesForQuery() {
