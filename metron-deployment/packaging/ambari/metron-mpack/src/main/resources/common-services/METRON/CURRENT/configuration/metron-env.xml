@@ -20,7 +20,7 @@
 <configuration supports_final="true">
     <property>
         <name>metron_home</name>
-        <value>/usr/metron/${metron.version}</value>
+        <value>/usr/hcp/1.9.1.3-4/metron</value>
         <description>Metron home directory</description>
         <display-name>Metron home</display-name>
     </property>
