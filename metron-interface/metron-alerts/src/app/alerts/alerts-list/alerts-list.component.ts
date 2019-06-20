@@ -295,8 +295,6 @@ export class AlertsListComponent implements OnInit, OnDestroy {
     if (timeRangeFilter.value === ALL_TIME) {
       this.queryBuilder.removeFilter(timeRangeFilter.field);
     } else {
-      // only one timerange filter allowed
-      this.queryBuilder.removeFilter(timeRangeFilter.field);
       this.queryBuilder.addOrUpdateFilter(timeRangeFilter);
     }
   }
