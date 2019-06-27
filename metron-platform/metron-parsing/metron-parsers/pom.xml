@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.apache.metron</groupId>
     <artifactId>metron-parsing</artifactId>
-    <version>0.7.2</version>
+    <version>0.7.1.1.9.1.4-4</version>
   </parent>
   <artifactId>metron-parsers</artifactId>
   <name>metron-parsers</name>
