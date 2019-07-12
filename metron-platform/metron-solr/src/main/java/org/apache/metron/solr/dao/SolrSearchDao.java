@@ -169,7 +169,11 @@ public class SolrSearchDao implements SearchDao {
 
   private String getCollections(List<String> indices) throws IOException, SolrServerException {
     List<String> existingCollections = CollectionAdminRequest.listCollections(client);
-    return indices.stream().filter(existingCollections::contains).collect(Collectors.joining(","));
+    CollectionAdminResponse response = new CollectionAdminRequest.ListAliases().process(client);
+    Collection<String> existingAliases = response.getAliases() != null ? response.getAliases().keySet() : new ArrayList<>();
+    return indices.stream()
+            .filter(index -> existingCollections.contains(index) || existingAliases.contains(index))
+            .collect(Collectors.joining(","));
   }
 
   private SolrQuery.ORDER getSolrSortOrder(
