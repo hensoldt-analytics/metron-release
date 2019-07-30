@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.apache.metron</groupId>
         <artifactId>metron-enrichment</artifactId>
-        <version>0.7.1</version>
+        <version>0.7.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -48,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.metron</groupId>
-            <artifactId>metron-writer</artifactId>
+            <artifactId>metron-writer-storm</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
