@@ -14,19 +14,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.metron.packaging.mpacks</groupId>
-    <artifactId>metron_mpack</artifactId>
-    <version>0.7.1.0</version>
+    <artifactId>hcp-ambari-mpack</artifactId>
+    <version>1.9.1.5-3</version>
     <name>Metron Ambari Management Pack</name>
 
     <parent>
         <groupId>org.apache.metron</groupId>
         <artifactId>metron-deployment</artifactId>
-        <version>0.7.1</version>
+        <version>0.7.1.1.9.1.5-3</version>
         <relativePath>../../..</relativePath>
     </parent>
 
@@ -55,8 +53,8 @@
                         <configuration>
                             <name>metron.version</name>
                             <value>${project.parent.version}</value>
-                            <regex>-SNAPSHOT</regex>
-                            <replacement></replacement>
+                            <regex>-.*</regex>
+                            <replacement />
                             <failIfNoMatch>false</failIfNoMatch>
                         </configuration>
                     </execution>
@@ -68,8 +66,8 @@
                         <configuration>
                             <name>metron.short.version</name>
                             <value>${project.parent.version}</value>
-                            <regex>\.|-SNAPSHOT</regex>
-                            <replacement></replacement>
+                            <regex>\.|-.*</regex>
+                            <replacement />
                             <failIfNoMatch>false</failIfNoMatch>
                         </configuration>
                     </execution>
