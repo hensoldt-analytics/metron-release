@@ -16,29 +16,29 @@
 <reposinfo>
     <os family="redhat6">
         <repo>
-            <baseurl>file:///localrepo</baseurl>
-            <repoid>METRON-${metron.version}</repoid>
+            <baseurl>http://public-repo-1.hortonworks.com/HCP/centos6/2.x/updates/2.0.1.0</baseurl>
+            <repoid>HCP-2.0.1.0-6</repoid>
             <reponame>METRON</reponame>
         </repo>
     </os>
     <os family="redhat7">
         <repo>
-            <baseurl>file:///localrepo</baseurl>
-            <repoid>METRON-${metron.version}</repoid>
+            <baseurl>http://public-repo-1.hortonworks.com/HCP/centos7/2.x/updates/2.0.1.0</baseurl>
+            <repoid>HCP-2.0.1.0-6</repoid>
             <reponame>METRON</reponame>
         </repo>
     </os>
     <os family="ubuntu14">
         <repo>
-            <baseurl>file:///localrepo</baseurl>
-            <repoid>METRON-${metron.version}</repoid>
-            <reponame>METRON</reponame>
+            <baseurl>http://public-repo-1.hortonworks.com/HCP/ubuntu12/2.x/updates/2.0.1.0</baseurl>
+            <repoid>HCP-2.0.1.0-6</repoid>
+            <reponame>HCP</reponame>
         </repo>
     </os>
     <os family="redhat-ppc7">
     <repo>
         <baseurl>file:///localrepo</baseurl>
-        <repoid>METRON-${metron.version}</repoid>
+        <repoid>HCP-2.0.1.0-6</repoid>
         <reponame>METRON</reponame>
     </repo>
     </os>

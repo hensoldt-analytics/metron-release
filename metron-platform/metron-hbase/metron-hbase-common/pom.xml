@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.apache.metron</groupId>
         <artifactId>metron-hbase</artifactId>
-        <version>0.7.2</version>
+        <version>0.7.2.2.0.1.0-6</version>
     </parent>
     <artifactId>metron-hbase-common</artifactId>
     <name>metron-hbase-common</name>
